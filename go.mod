@@ -17,28 +17,28 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/valyala/fasthttp v1.21.0
 	github.com/wzshiming/ctc v1.2.3
-	golang.org/x/text v0.3.5
+	golang.org/x/text v0.3.7
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.0.4
 	gorm.io/driver/sqlite v1.1.4
-	gorm.io/driver/sqlserver v1.0.6
-	gorm.io/gorm v1.20.12
+	gorm.io/driver/sqlserver v1.4.2
+	gorm.io/gorm v1.24.0
 )
 
 require (
 	github.com/andybalholm/brotli v1.0.0 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/denisenkom/go-mssqldb v0.0.0-20200428022330-06a60b6afbbc // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
-	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
+	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
+	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.1 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.5 // indirect
+	github.com/microsoft/go-mssqldb v0.19.0 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/tcplisten v0.0.0-20161114210144-ceec8f93295a // indirect
 	github.com/wzshiming/winseq v0.0.0-20200112104235-db357dc107ae // indirect
-	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
-	golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4 // indirect
+	golang.org/x/crypto v0.0.0-20221005025214-4161e89ecf1b // indirect
+	golang.org/x/sys v0.0.0-20220224120231-95c6836cb0e7 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
