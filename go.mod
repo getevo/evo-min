@@ -20,9 +20,9 @@ require (
 	golang.org/x/text v0.3.5
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/mysql v1.0.4
-	gorm.io/driver/sqlite v1.1.4
+	gorm.io/driver/sqlite v1.4.4
 	gorm.io/driver/sqlserver v1.0.6
-	gorm.io/gorm v1.20.12
+	gorm.io/gorm v1.24.0
 )
 
 require (
@@ -32,9 +32,9 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
-	github.com/jinzhu/now v1.1.1 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/mattn/go-sqlite3 v1.14.5 // indirect
+	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/tcplisten v0.0.0-20161114210144-ceec8f93295a // indirect
 	github.com/wzshiming/winseq v0.0.0-20200112104235-db357dc107ae // indirect
