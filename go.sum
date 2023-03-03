@@ -2,8 +2,8 @@ github.com/AlexanderGrom/go-event v0.0.0-20180406111247-a2f1486e096e h1:VGZKZCJ6
 github.com/AlexanderGrom/go-event v0.0.0-20180406111247-a2f1486e096e/go.mod h1:EDsvGVsiDX518UqAQ5Ve+zBDNZlKrh3wvYRujZmgIwo=
 github.com/ajg/form v1.5.1 h1:t9c7v8JUKu/XxOGBU0yjNpaMloxGEJhUkqFRq0ibGeU=
 github.com/ajg/form v1.5.1/go.mod h1:uL1WgH+h2mgNtvBq0339dVnzXdBETtL2LeUXaIv25UY=
-github.com/alecthomas/repr v0.0.0-20210301060118-828286944d6a h1:GY6ZI5mOHoiQ+g2ETFQGYu6fNgc6bCe4b4kr8tSrhpg=
-github.com/alecthomas/repr v0.0.0-20210301060118-828286944d6a/go.mod h1:2kn6fqh/zIyPLmm3ugklbEi5hg5wS435eygvNfaDQL8=
+github.com/alecthomas/repr v0.2.0 h1:HAzS41CIzNW5syS8Mf9UwXhNH1J9aix/BvDRf1Ml2Yk=
+github.com/alecthomas/repr v0.2.0/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
 github.com/andybalholm/brotli v1.0.0 h1:7UCwP93aiSfvWpapti8g88vVVGp2qqtGyePsSuDafo4=
 github.com/andybalholm/brotli v1.0.0/go.mod h1:loMXtMfwqflxFJPmdbJO0a3KNoPuLBgiu3qAvBg8x/Y=
 github.com/araddon/dateparse v0.0.0-20210207001429-0eec95c9db7e h1:OjdSMCht0ZVX7IH0nTdf00xEustvbtUGRgMh3gbdmOg=
