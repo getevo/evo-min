@@ -1,0 +1,58 @@
+APP:
+  MyConfig: Anything
+HTTP:
+  BodyLimit: "0"
+  CaseSensitive: "false"
+  CompressedFileSuffix: ""
+  Concurrency: "0"
+  DisableDefaultContentType: "false"
+  DisableDefaultDate: "false"
+  DisableHeaderNormalizing: "false"
+  DisableKeepalive: "false"
+  DisableStartupMessage: "false"
+  ETag: "false"
+  ErrorHandler: <nil>
+  GETOnly: "false"
+  IdleTimeout: 0s
+  Immutable: "false"
+  JSONEncoder: <nil>
+  Network: ""
+  Prefork: "false"
+  ProxyHeader: ""
+  ReadBufferSize: "0"
+  ReadTimeout: 0s
+  ReduceMemoryUsage: "false"
+  ServerHeader: New Header2
+  StrictRouting: "false"
+  UnescapePath: "false"
+  Views: <nil>
+  WriteBufferSize: "0"
+  WriteTimeout: 0s
+fiber:
+  BodyLimit: "0"
+  CaseSensitive: "false"
+  CompressedFileSuffix: ""
+  Concurrency: "0"
+  DisableDefaultContentType: "false"
+  DisableDefaultDate: "false"
+  DisableHeaderNormalizing: "false"
+  DisableKeepalive: "false"
+  DisableStartupMessage: "false"
+  ETag: "false"
+  ErrorHandler: <nil>
+  GETOnly: "false"
+  IdleTimeout: 0s
+  Immutable: "false"
+  JSONEncoder: <nil>
+  Network: ""
+  Prefork: "false"
+  ProxyHeader: ""
+  ReadBufferSize: "0"
+  ReadTimeout: 0s
+  ReduceMemoryUsage: "false"
+  ServerHeader: My Default Server Header
+  StrictRouting: "false"
+  UnescapePath: "false"
+  Views: <nil>
+  WriteBufferSize: "0"
+  WriteTimeout: 0s
