@@ -1,8 +1,8 @@
 package settings
 
 import (
-	"github.com/getevo/evo/lib/generic"
-	"github.com/getevo/evo/lib/settings/yml"
+	"github.com/getevo/evo-min/lib/generic"
+	"github.com/getevo/evo-min/lib/settings/yml"
 )
 
 var instances = []Interface{&yml.Yaml{}}

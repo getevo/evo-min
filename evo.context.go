@@ -3,14 +3,14 @@ package evo
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/getevo/evo/lib/log"
+	"github.com/getevo/evo-min/lib/log"
+	"github.com/gofiber/fiber/v2"
 	"net/url"
 	"reflect"
 	"strings"
 	"time"
 
-	e "github.com/getevo/evo/errors"
-	"github.com/gofiber/fiber/v2"
+	e "github.com/getevo/evo-min/errors"
 )
 
 type Request struct {

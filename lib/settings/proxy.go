@@ -2,7 +2,7 @@ package settings
 
 import (
 	"fmt"
-	"github.com/getevo/evo/lib/generic"
+	"github.com/getevo/evo-min/lib/generic"
 	"reflect"
 	"strings"
 )

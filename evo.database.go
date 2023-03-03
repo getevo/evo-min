@@ -2,7 +2,7 @@ package evo
 
 import (
 	"fmt"
-	"github.com/getevo/evo/lib/settings"
+	"github.com/getevo/evo-min/lib/settings"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/driver/sqlserver"
@@ -17,7 +17,6 @@ import (
 var db *gorm.DB
 
 func setupDatabase() {
-	Events.Go("database.starts")
 	var err error
 	var config = DatabaseConfig{}
 	settings.Register("Database", &config)
@@ -67,7 +66,6 @@ func setupDatabase() {
 	/*	var driver = database.Database{}
 		driver.Init()
 		settings.SetInterface(&driver)*/
-	Events.Go("database.started")
 
 }
 

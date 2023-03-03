@@ -2,8 +2,8 @@ package log
 
 import (
 	"fmt"
-	"github.com/getevo/evo/lib/date"
-	"github.com/getevo/evo/lib/log/logger"
+	"github.com/getevo/evo-min/lib/date"
+	"github.com/getevo/evo-min/lib/log/logger"
 	"github.com/wzshiming/ctc"
 	"io"
 	"os"

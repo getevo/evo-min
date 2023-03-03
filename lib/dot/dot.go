@@ -2,7 +2,7 @@ package dot
 
 import (
 	"errors"
-	"github.com/getevo/evo/lib/reflections"
+	"github.com/getevo/evo-min/lib/reflections"
 	"reflect"
 	"strings"
 )

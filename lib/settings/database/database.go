@@ -2,9 +2,9 @@ package database
 
 import (
 	"fmt"
-	"github.com/getevo/evo"
-	"github.com/getevo/evo/lib/args"
-	"github.com/getevo/evo/lib/generic"
+	"github.com/getevo/evo-min"
+	"github.com/getevo/evo-min/lib/args"
+	"github.com/getevo/evo-min/lib/generic"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"strings"

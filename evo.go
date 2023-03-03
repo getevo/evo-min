@@ -1,9 +1,8 @@
 package evo
 
 import (
-	"github.com/AlexanderGrom/go-event"
-	"github.com/getevo/evo/lib/generic"
-	"github.com/getevo/evo/lib/settings"
+	"github.com/getevo/evo-min/lib/generic"
+	"github.com/getevo/evo-min/lib/settings"
 	"github.com/gofiber/fiber/v2"
 	"log"
 )
@@ -12,7 +11,6 @@ var (
 	//Public
 	app *fiber.App
 
-	Events          = event.New()
 	StatusCodePages = map[int]string{}
 	Any             func(request *Request) error
 	//private
@@ -64,7 +62,6 @@ func Run() {
 			return nil
 		})
 	}
-	Events.Go("init.after")
 
 	var err error
 	/*	if config.Server.HTTPS {
@@ -80,7 +77,6 @@ func Run() {
 
 		}*/
 	err = app.Listen(http.Host + ":" + http.Port)
-	Events.Go("server.panic")
 
 	log.Fatal(err)
 }

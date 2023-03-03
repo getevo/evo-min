@@ -1,6 +1,6 @@
 package database
 
-import "github.com/getevo/evo"
+import "github.com/getevo/evo-min"
 
 type Settings struct {
 	evo.Model

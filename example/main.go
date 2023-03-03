@@ -1,6 +1,6 @@
 package main
 
-import "github.com/getevo/evo"
+import "github.com/getevo/evo-min"
 
 func main() {
 	evo.Setup()

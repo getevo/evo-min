@@ -2,11 +2,11 @@ package yml
 
 import (
 	"fmt"
-	"github.com/getevo/evo/lib/args"
-	"github.com/getevo/evo/lib/dot"
-	"github.com/getevo/evo/lib/generic"
-	"github.com/getevo/evo/lib/gpath"
-	"gopkg.in/yaml.v2"
+	"github.com/getevo/evo-min/lib/args"
+	"github.com/getevo/evo-min/lib/dot"
+	"github.com/getevo/evo-min/lib/generic"
+	"github.com/getevo/evo-min/lib/gpath"
+	"gopkg.in/yaml.v3"
 )
 
 type Yaml struct {
