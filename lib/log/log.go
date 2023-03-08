@@ -54,6 +54,14 @@ func ParseLevel(expr string) Level {
 	}
 }
 
+func AddWriter(input ...func(message string)) {
+	writers = append(writers, input...)
+}
+
+func SetWriters(input ...func(message string)) {
+	writers = input
+}
+
 func SetLevel(lvl Level) {
 	level = lvl
 }
