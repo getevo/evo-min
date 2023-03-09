@@ -41,11 +41,6 @@ func Group(path string, handlers ...func(request *Request)) group {
 	return app.Group(prefix, handlers...)
 }*/
 
-// Static append path with given prefix to static files
-func Static(prefix, path string) {
-	statics = append(statics, [2]string{prefix, path})
-}
-
 // Use registers a middleware route.
 // Middleware matches requests beginning with the provided prefix.
 // Providing a prefix is optional, it defaults to "/"

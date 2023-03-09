@@ -6,7 +6,7 @@ import (
 
 const PERMANENT = -1
 
-type CacheInterface interface {
+type Interface interface {
 	// Name returns driver name
 	Name() string
 

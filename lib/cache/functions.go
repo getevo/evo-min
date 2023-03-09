@@ -6,10 +6,10 @@ import (
 	"time"
 )
 
-var defaultDriver CacheInterface = nil
-var drivers = map[string]CacheInterface{}
+var defaultDriver Interface = nil
+var drivers = map[string]Interface{}
 
-func SetDefaultDriver(driver CacheInterface) {
+func SetDefaultDriver(driver Interface) {
 	AddDriver(driver)
 	defaultDriver = driver
 }
@@ -18,22 +18,22 @@ func DriverName() string {
 	return defaultDriver.Name()
 }
 
-func Drivers() map[string]CacheInterface {
+func Drivers() map[string]Interface {
 	return drivers
 }
 
-func Driver(driver string) (CacheInterface, bool) {
+func Driver(driver string) (Interface, bool) {
 	if v, ok := drivers[driver]; ok {
 		return v, ok
 	}
 	return nil, false
 }
 
-func Use(driver string) CacheInterface {
+func Use(driver string) Interface {
 	return drivers[driver]
 }
 
-func AddDriver(driver CacheInterface) {
+func AddDriver(driver Interface) {
 	if _, ok := drivers[driver.Name()]; !ok {
 		drivers[driver.Name()] = driver
 		var err = drivers[driver.Name()].Register()

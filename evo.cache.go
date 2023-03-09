@@ -12,13 +12,13 @@ type cached struct {
 	header  fasthttp.ResponseHeader
 }
 
-var Cache cacheInterface = cache.New(1*time.Minute, 1*time.Second)
+var Cache Interface = cache.New(1*time.Minute, 1*time.Second)
 
-func SetCacheInterface(c cacheInterface) {
+func SetInterface(c Interface) {
 	Cache = c
 }
 
-type cacheInterface interface {
+type Interface interface {
 	// Add an item to the cache, replacing any existing item. If the duration is 0
 	// (DefaultExpiration), the cache's default expiration time is used. If it is -1
 	// (NoExpiration), the item never expires.
