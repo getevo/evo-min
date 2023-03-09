@@ -25,6 +25,8 @@ import (
 // default *Req
 var std = New()
 
+type Timeout time.Duration
+
 // flags to decide which part can be outputed
 const (
 	LreqHead  = 1 << iota // output request head (request line and request header)
@@ -238,6 +240,16 @@ func (r *Req) Do(method, rawurl string, vs ...interface{}) (resp *Resp, err erro
 			setBodyBytes(req, resp, vv.Bytes())
 		case *http.Client:
 			resp.client = vv
+		case Timeout:
+			if resp.client == nil {
+				resp.client = newClient()
+			}
+			resp.client.Timeout = time.Duration(vv)
+		case time.Duration:
+			if resp.client == nil {
+				resp.client = newClient()
+			}
+			resp.client.Timeout = time.Duration(vv)
 		case FileUpload:
 			uploads = append(uploads, vv)
 		case []FileUpload:
@@ -359,7 +371,7 @@ func (r *Req) Do(method, rawurl string, vs ...interface{}) (resp *Resp, err erro
 
 func setBodyBytes(req *http.Request, resp *Resp, data []byte) {
 	resp.reqBody = data
-	req.Body = ioutil.NopCloser(bytes.NewReader(data))
+	req.Body = io.NopCloser(bytes.NewReader(data))
 	req.ContentLength = int64(len(data))
 }
 
