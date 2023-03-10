@@ -58,7 +58,7 @@ func setupDatabase() {
 		db, err = gorm.Open(sqlite.Open(config.Database+config.Params), cfg)
 	}
 	if err != nil {
-		panic(err)
+		log.Fatal("unable to connect to database", "error", err)
 		return
 	}
 

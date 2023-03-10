@@ -1,21 +1,10 @@
 package database
 
-import "github.com/getevo/evo-min"
-
-type Settings struct {
-	evo.Model
-	Reference string
-	Title     string
-	Data      string
-	Default   string
-	Ptr       interface{} `gorm:"-"`
-}
-
 type SettingDomain struct {
-	DomainID    int       `gorm:"column:domain_id;primaryKey" json:"domain_id"`
+	DomainID    int       `gorm:"column:domain_id" json:"domain_id"`
 	Title       string    `gorm:"column:title" json:"title"`
 	Description string    `gorm:"column:description" json:"description"`
-	Domain      string    `gorm:"column:domain" json:"domain"`
+	Domain      string    `gorm:"column:domain;primaryKey" json:"domain"`
 	Type        string    `gorm:"column:type" json:"type"`
 	ReadOnly    bool      `gorm:"column:read_only" json:"read_only"`
 	Visible     bool      `gorm:"column:visible" json:"visible"`

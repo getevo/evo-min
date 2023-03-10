@@ -2,8 +2,8 @@ package database
 
 import (
 	"fmt"
-	"github.com/getevo/evo-min"
 	"github.com/getevo/evo-min/lib/args"
+
 	"github.com/getevo/evo-min/lib/generic"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -14,6 +14,10 @@ import (
 var db *gorm.DB
 var Driver = &Database{}
 var domains = map[string]SettingDomain{}
+
+func SetDBO(v *gorm.DB) {
+	db = v
+}
 
 type Database struct {
 	mu   sync.Mutex
@@ -63,7 +67,7 @@ func (config *Database) Set(key string, value interface{}) error {
 	key = strings.ToUpper(key)
 	var chunks = strings.SplitN(key, ".", 2)
 	if len(chunks) == 2 {
-		evo.GetDBO().Where("domain = ? AND name = ?", chunks[0], chunks[1]).Model(Setting{}).Update("value", value)
+		db.Where("domain = ? AND name = ?", chunks[0], chunks[1]).Model(Setting{}).Update("value", value)
 	}
 	return nil
 }
@@ -80,15 +84,12 @@ func (config *Database) SetMulti(data map[string]interface{}) error {
 func (config *Database) Register(settings ...interface{}) error {
 	for _, s := range settings {
 		var v = generic.Parse(s)
-		var setting = Setting{}
-		var err = v.Cast(&setting)
-		if domain, ok := s.(SettingDomain); ok {
-			if _, exists := domains[setting.Domain]; !exists {
-				db.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&domain)
-			}
-		} else if err == nil {
-			if v.Is("settings.Setting") {
-				return fmt.Errorf("invalid settings")
+
+		if v.Is("settings.Setting") {
+			var setting = Setting{}
+			var err = v.Cast(&setting)
+			if err != nil {
+				return err
 			}
 			if ok, _ := config.Has(setting.Domain + "." + setting.Name); !ok {
 				config.Set(setting.Domain+"."+setting.Name, setting.Value)
@@ -104,19 +105,27 @@ func (config *Database) Register(settings ...interface{}) error {
 					db.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&domain)
 				}
 			}
-		} else {
-			return err
+		} else if v.Is("settings.SettingDomain") {
+			fmt.Println(v.Input)
+			var domain = SettingDomain{}
+			var err = v.Cast(&domain)
+			if err != nil {
+				return err
+			}
+
+			if _, exists := domains[domain.Domain]; !exists {
+				db.Debug().Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&domain)
+			}
 		}
+
 	}
 	return nil
 }
 func (config *Database) Init(params ...string) error {
 	config.mu.Lock()
 	var items []Setting
-	db = evo.GetDBO()
-
 	if args.Exists("-migrate") {
-		db.Debug().AutoMigrate(&Setting{}, &SettingDomain{})
+		db.AutoMigrate(&Setting{}, &SettingDomain{})
 	}
 	if config.data == nil {
 		config.data = map[string]map[string]generic.Value{}

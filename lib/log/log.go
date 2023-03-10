@@ -25,6 +25,8 @@ func stdWriter(log string) {
 	fmt.Println(log)
 }
 
+var levels = []string{"", "Critical", "Error", "Warning", "Notice", "Info", "Debug"}
+
 const (
 	CriticalLevel Level = iota + 1
 	ErrorLevel
@@ -73,8 +75,8 @@ func SetStackTrace(lvl int) {
 func msg(message interface{}, level Level, params ...interface{}) {
 	_, file, line, _ := runtime.Caller(2)
 	var result = "{"
-	result += "\"l\":" + strconv.Itoa(int(level))
-	result += ",\"d\":" + quote(time.Now().Format("2006-01-02 15:04:03"))
+	result += "\"l\":" + quote(levels[level])
+	result += ",\"d\":" + quote(time.Now().Format("2006-01-02 15:04:05"))
 	result += ",\"f\":" + quote(file[len(wd)+1:]+":"+strconv.Itoa(line))
 	result += ",\"m\":" + quote(fmt.Sprint(message))
 

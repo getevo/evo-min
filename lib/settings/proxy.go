@@ -68,6 +68,8 @@ func (config *proxy) Register(settings ...interface{}) error {
 	if len(settings) > 0 {
 		if _, ok := settings[0].(Setting); ok {
 			return drivers[len(drivers)-1].Register(settings...)
+		} else if _, ok := settings[0].(SettingDomain); ok {
+			return drivers[len(drivers)-1].Register(settings...)
 		} else {
 			var pkg = ""
 			var set []interface{}

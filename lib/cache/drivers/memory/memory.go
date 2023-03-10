@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/getevo/evo-min/lib/log"
 	"github.com/getevo/evo-min/lib/settings"
-	"github.com/getevo/evo-min/lib/settings/database"
 	"github.com/kelindar/binary"
 	"sync"
 	"time"
@@ -22,7 +21,7 @@ func (driver) Register() error {
 	items = sync.Map{}
 
 	settings.Register(
-		database.SettingDomain{
+		settings.SettingDomain{
 			Title:       "Cache",
 			Domain:      "Cache",
 			Description: "system cache configurations",

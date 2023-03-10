@@ -33,6 +33,15 @@ type Setting struct {
 	Visible     bool   `gorm:"column:visible" json:"visible"`
 }
 
+type SettingDomain struct {
+	DomainID    int    `gorm:"column:domain_id;primaryKey" json:"domain_id"`
+	Title       string `gorm:"column:title" json:"title"`
+	Description string `gorm:"column:description" json:"description"`
+	Domain      string `gorm:"column:domain" json:"domain"`
+	ReadOnly    bool   `gorm:"column:read_only" json:"read_only"`
+	Visible     bool   `gorm:"column:visible" json:"visible"`
+}
+
 func SetDefaultDriver(driver Interface) {
 	AddDriver(driver)
 	defaultDriver = driver

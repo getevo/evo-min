@@ -4,6 +4,7 @@ import (
 	"github.com/getevo/evo-min/lib/cache"
 	"github.com/getevo/evo-min/lib/generic"
 	"github.com/getevo/evo-min/lib/settings"
+	"github.com/getevo/evo-min/lib/settings/database"
 	"github.com/gofiber/fiber/v2"
 	"log"
 )
@@ -24,7 +25,10 @@ func Setup() {
 	var fiberConfig = fiber.Config{}
 	generic.Parse(http).Cast(&fiberConfig)
 	app = fiber.New(fiberConfig)
-
+	if settings.Get("Database.Enabled").Bool() {
+		database.SetDBO(GetDBO())
+		settings.SetDefaultDriver(database.Driver)
+	}
 	cache.Register()
 }
 

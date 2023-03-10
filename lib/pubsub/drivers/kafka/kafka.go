@@ -4,7 +4,6 @@ import (
 	"github.com/getevo/evo-min/lib/kafka"
 	"github.com/getevo/evo-min/lib/pubsub"
 	"github.com/getevo/evo-min/lib/settings"
-	"github.com/getevo/evo-min/lib/settings/database"
 	"github.com/kelindar/binary"
 )
 
@@ -104,7 +103,7 @@ func (driver) Register() error {
 		return nil
 	}
 	settings.Register(
-		database.SettingDomain{
+		settings.SettingDomain{
 			Title:       "Kafka",
 			Domain:      "Kafka",
 			Description: "Apache Kafka configurations",

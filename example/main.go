@@ -9,7 +9,6 @@ import (
 	"github.com/getevo/evo-min/lib/pubsub"
 	"github.com/getevo/evo-min/lib/pubsub/drivers/kafka"
 	"github.com/getevo/evo-min/lib/settings"
-	"github.com/getevo/evo-min/lib/settings/database"
 	"time"
 )
 
@@ -18,11 +17,9 @@ func main() {
 
 	var db = evo.GetDBO()
 	var data = map[string]interface{}{}
-	db.Debug().Raw("SELECT * FROM services").Scan(&data)
+	db.Raw("SELECT * FROM services").Scan(&data)
 
-	settings.SetDefaultDriver(database.Driver)
 	cache.SetDefaultDriver(redis.Driver)
-
 	pubsub.AddDriver(redis.Driver)
 	pubsub.SetDefaultDriver(kafka.Driver)
 
