@@ -12,10 +12,16 @@ import (
 )
 
 var db *gorm.DB
+var Driver = &Database{}
+var domains = map[string]SettingDomain{}
 
 type Database struct {
 	mu   sync.Mutex
 	data map[string]map[string]generic.Value
+}
+
+func (config *Database) Name() string {
+	return "database"
 }
 
 func (config *Database) Get(key string) generic.Value {
@@ -57,7 +63,7 @@ func (config *Database) Set(key string, value interface{}) error {
 	key = strings.ToUpper(key)
 	var chunks = strings.SplitN(key, ".", 2)
 	if len(chunks) == 2 {
-		db.Where("domain = ? AND name = ?", chunks[0], chunks[1]).Model(Setting{}).Update("value", value)
+		evo.GetDBO().Where("domain = ? AND name = ?", chunks[0], chunks[1]).Model(Setting{}).Update("value", value)
 	}
 	return nil
 }
@@ -76,13 +82,27 @@ func (config *Database) Register(settings ...interface{}) error {
 		var v = generic.Parse(s)
 		var setting = Setting{}
 		var err = v.Cast(&setting)
-		if err == nil {
-			if !v.Is("settings.Setting") {
+		if domain, ok := s.(SettingDomain); ok {
+			if _, exists := domains[setting.Domain]; !exists {
+				db.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&domain)
+			}
+		} else if err == nil {
+			if v.Is("settings.Setting") {
 				return fmt.Errorf("invalid settings")
 			}
 			if ok, _ := config.Has(setting.Domain + "." + setting.Name); !ok {
 				config.Set(setting.Domain+"."+setting.Name, setting.Value)
 				db.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&setting)
+				if _, exists := domains[setting.Domain]; !exists {
+					domain := SettingDomain{
+						Title:       setting.Domain,
+						Domain:      setting.Domain,
+						Description: "",
+						ReadOnly:    false,
+						Visible:     true,
+					}
+					db.Clauses(clause.Insert{Modifier: "IGNORE"}).Create(&domain)
+				}
 			}
 		} else {
 			return err
@@ -94,8 +114,12 @@ func (config *Database) Init(params ...string) error {
 	config.mu.Lock()
 	var items []Setting
 	db = evo.GetDBO()
-	if args.Exists("migrate") {
-		db.AutoMigrate(&Setting{}, &SettingDomain{})
+
+	if args.Exists("-migrate") {
+		db.Debug().AutoMigrate(&Setting{}, &SettingDomain{})
+	}
+	if config.data == nil {
+		config.data = map[string]map[string]generic.Value{}
 	}
 	db.Find(&items)
 	for _, item := range items {
@@ -105,6 +129,11 @@ func (config *Database) Init(params ...string) error {
 			config.data[item.Domain] = map[string]generic.Value{}
 		}
 		config.data[item.Domain][item.Name] = generic.Parse(item.Value)
+	}
+	var list []SettingDomain
+	db.Find(&list)
+	for idx, item := range list {
+		domains[item.Domain] = list[idx]
 	}
 	config.mu.Unlock()
 	return nil

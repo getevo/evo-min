@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/getevo/evo-min/lib/log"
 	"github.com/getevo/evo-min/lib/settings"
+	"github.com/getevo/evo-min/lib/settings/database"
 	"github.com/kelindar/binary"
 	"sync"
 	"time"
@@ -20,16 +21,24 @@ var items sync.Map
 func (driver) Register() error {
 	items = sync.Map{}
 
-	settings.Register(settings.Setting{
-		Domain:      "CACHE",
-		Name:        "MEMORY_JANITOR_INTERVAL",
-		Title:       "IN-Memory cache janitor interval",
-		Description: "The interval which janitor start to clean the memory for evicted items.",
-		Type:        "duration",
-		Value:       "1m",
-		ReadOnly:    false,
-		Visible:     true,
-	})
+	settings.Register(
+		database.SettingDomain{
+			Title:       "Cache",
+			Domain:      "Cache",
+			Description: "system cache configurations",
+			ReadOnly:    false,
+			Visible:     true,
+		},
+		settings.Setting{
+			Domain:      "CACHE",
+			Name:        "MEMORY_JANITOR_INTERVAL",
+			Title:       "IN-Memory cache janitor interval",
+			Description: "The interval which janitor start to clean the memory for evicted items.",
+			Type:        "duration",
+			Value:       "1m",
+			ReadOnly:    false,
+			Visible:     true,
+		})
 	var sleep, err = settings.Get("CACHE.MEMORY_JANITOR_INTERVAL").Duration()
 	if err != nil || sleep < 1*time.Second {
 		log.Warning("Invalid CACHE.MEMORY_JANITOR_INTERVAL", "value", settings.Get("CACHE.MEMORY_JANITOR_INTERVAL").String())

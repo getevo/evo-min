@@ -8,6 +8,8 @@ require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/avct/uasurfer v0.0.0-20191028135549-26b5daa857f1
 	github.com/awoodbeck/strftime v0.0.0-20180221155908-016cde65fcde
+	github.com/fatih/structs v1.1.0
+	github.com/getevo/evo v1.1.4
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofiber/fiber/v2 v2.42.0
 	github.com/gofiber/utils v1.0.1
@@ -16,9 +18,10 @@ require (
 	github.com/klauspost/compress v1.16.0
 	github.com/otiai10/copy v1.9.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/segmentio/kafka-go v0.4.39
 	github.com/valyala/fasthttp v1.44.0
 	golang.org/x/text v0.7.0
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/mysql v1.4.7
 	gorm.io/driver/sqlite v1.4.4
 	gorm.io/driver/sqlserver v1.4.2
@@ -41,6 +44,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/microsoft/go-mssqldb v0.19.0 // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
+	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/savsgio/dictpool v0.0.0-20221023140959-7bf2e61cea94 // indirect
 	github.com/savsgio/gotils v0.0.0-20220530130905-52f3993e8d6d // indirect

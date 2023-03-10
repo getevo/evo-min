@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"github.com/getevo/evo-min/lib/log"
+	"github.com/getevo/evo-min/lib/pubsub"
 	"github.com/getevo/evo-min/lib/settings"
 	"github.com/go-redis/redis/v8"
 	"github.com/kelindar/binary"
@@ -13,13 +14,40 @@ import (
 var Driver = driver{}
 var marshaller func(input interface{}) ([]byte, error) = binary.Marshal
 var unmarshaller func(bytes []byte, out interface{}) error = binary.Unmarshal
+var listeners = map[string][]func(topic string, message []byte, driver pubsub.Interface){}
 
 type driver struct{}
+
+func (d driver) Subscribe(topic string, onMessage func(topic string, message []byte, driver pubsub.Interface), params ...interface{}) {
+	if _, ok := listeners[topic]; !ok {
+		listeners[topic] = []func(topic string, message []byte, driver pubsub.Interface){}
+	}
+	listeners[topic] = append(listeners[topic], onMessage)
+	go func() {
+		pubsub := Client.Subscribe(context.Background(), prefix+topic)
+		for {
+			m, err := pubsub.ReceiveMessage(context.Background())
+			if err != nil {
+				log.Error("unable to receive redis message", "error", err)
+			}
+			for _, callback := range listeners[topic] {
+				go callback(topic, []byte(m.Payload), d)
+			}
+
+		}
+	}()
+}
+func (d driver) Publish(topic string, message []byte, params ...interface{}) error {
+	return Client.Publish(context.Background(), prefix+topic, message).Err()
+}
 
 var prefix = ""
 var Client redis.UniversalClient
 
 func (driver) Register() error {
+	if Client != nil {
+		return nil
+	}
 	settings.Register(settings.Setting{
 		Domain:      "CACHE",
 		Name:        "REDIS_ADDRESS",
@@ -39,8 +67,9 @@ func (driver) Register() error {
 			Visible:     true,
 		},
 	)
-	prefix = settings.Get("REDIS.PREFIX").String()
-	var addrs = strings.Split(settings.Get("REDIS.ADDRESS").String(), ",")
+	prefix = settings.Get("CACHE.REDIS_PREFIX").String()
+	var addrs = strings.Split(settings.Get("CACHE.REDIS_ADDRESS").String(), ",")
+
 	if len(addrs) == 1 {
 		Client = redis.NewClient(&redis.Options{
 			Addr: addrs[0],

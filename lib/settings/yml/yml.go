@@ -9,10 +9,16 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var Driver = &Yaml{}
+
 type Yaml struct {
 	data    map[string]interface{}
 	path    string
 	writeFn func()
+}
+
+func (config *Yaml) Name() string {
+	return "yml"
 }
 
 func (config *Yaml) Get(key string) generic.Value {

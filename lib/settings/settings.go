@@ -2,13 +2,16 @@ package settings
 
 import (
 	"github.com/getevo/evo-min/lib/generic"
+	"github.com/getevo/evo-min/lib/log"
 	"github.com/getevo/evo-min/lib/settings/yml"
 )
 
-var instances = []Interface{&yml.Yaml{}}
-var Instance = proxy{}
+var drivers = []Interface{&yml.Yaml{}}
+var defaultDriver Interface = &proxy{}
 
 type Interface interface {
+	// Name returns driver name
+	Name() string
 	Get(key string) generic.Value
 	Has(key string) (bool, generic.Value)
 	All() map[string]generic.Value
@@ -30,34 +33,79 @@ type Setting struct {
 	Visible     bool   `gorm:"column:visible" json:"visible"`
 }
 
-func SetInterface(i Interface) {
-	instances = append(instances, i)
+func SetDefaultDriver(driver Interface) {
+	AddDriver(driver)
+	defaultDriver = driver
+}
+
+func DriverName() string {
+	return defaultDriver.Name()
+}
+
+func Drivers() map[string]Interface {
+	var list = map[string]Interface{}
+	for idx, item := range drivers {
+		list[item.Name()] = drivers[idx]
+	}
+	return list
+}
+
+func Driver(driver string) (Interface, bool) {
+
+	for idx, item := range drivers {
+		if item.Name() == driver {
+			return drivers[idx], true
+		}
+	}
+	return nil, false
+}
+
+func Use(driver string) Interface {
+	for idx, item := range drivers {
+		if item.Name() == driver {
+			return drivers[idx]
+		}
+	}
+	return nil
+}
+
+func AddDriver(driver Interface) {
+	if _, ok := Driver(driver.Name()); !ok {
+		drivers = append(drivers, driver)
+		var err = driver.Init()
+		if err != nil {
+			log.Fatal("unable to initiate pub/sub driver", "name", driver.Name(), "error", err)
+		}
+	}
+	if defaultDriver == nil {
+		defaultDriver = driver
+	}
 }
 
 func Get(key string) generic.Value {
-	return Instance.Get(key)
+	return defaultDriver.Get(key)
 }
 
 func Has(key string) (bool, generic.Value) {
-	return Instance.Has(key)
+	return defaultDriver.Has(key)
 }
 
 func All() map[string]generic.Value {
-	return Instance.All()
+	return defaultDriver.All()
 }
 
 func Set(key string, value interface{}) error {
-	return Instance.Set(key, value)
+	return defaultDriver.Set(key, value)
 }
 
 func SetMulti(data map[string]interface{}) error {
-	return Instance.SetMulti(data)
+	return defaultDriver.SetMulti(data)
 }
 
 func Register(settings ...interface{}) {
-	Instance.Register(settings...)
+	defaultDriver.Register(settings...)
 }
 
 func Init(params ...string) error {
-	return Instance.Init(params...)
+	return defaultDriver.Init(params...)
 }

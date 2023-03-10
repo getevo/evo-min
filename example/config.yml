@@ -3,17 +3,17 @@ CACHE:
 Database:
     Cache: "false"
     ConnMaxLifTime: 1h
-    Database: ""
+    Database: ---
     Debug: "3"
-    Enabled: "false"
-    MaxIdleConns: "10"
-    MaxOpenConns: "100"
+    Enabled: true
+    MaxIdleConns: 10
+    MaxOpenConns: 100
     Params: ""
-    Password: ""
+    Password: ---
     SSLMode: "false"
-    Server: 127.0.0.1:3306
+    Server: 192.168.1.102:3306
     SlowQueryThreshold: 500ms
-    Type: sqlite
+    Type: mysql
     Username: root
 HTTP:
     BodyLimit: 128kb

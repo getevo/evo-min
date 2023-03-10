@@ -125,6 +125,7 @@ func Flush() error {
 	return defaultDriver.Flush()
 }
 
-func Register() {
+func Register() error {
 	SetDefaultDriver(memory.Driver)
+	return nil
 }

@@ -14,11 +14,15 @@ type proxy struct {
 	instance map[string]Interface
 }
 
+func (config *proxy) Name() string {
+	return drivers[len(drivers)-1].Name()
+}
+
 func (config *proxy) Get(key string) generic.Value {
 	if v, ok := fastAccess[key]; ok {
 		return v
 	}
-	for _, instance := range instances {
+	for _, instance := range drivers {
 		ok, v := instance.Has(key)
 		if ok {
 			fastAccess[key] = v
@@ -31,7 +35,7 @@ func (config *proxy) Has(key string) (bool, generic.Value) {
 	if v, ok := fastAccess[key]; ok {
 		return ok, v
 	}
-	for _, instance := range instances {
+	for _, instance := range drivers {
 		ok, v := instance.Has(key)
 		if ok {
 			fastAccess[key] = v
@@ -41,10 +45,10 @@ func (config *proxy) Has(key string) (bool, generic.Value) {
 	return false, generic.Parse("")
 }
 func (config *proxy) All() map[string]generic.Value {
-	return instances[len(instances)-1].All()
+	return drivers[len(drivers)-1].All()
 }
 func (config *proxy) Set(key string, value interface{}) error {
-	instances[len(instances)-1].Set(key, value)
+	drivers[len(drivers)-1].Set(key, value)
 	delete(fastAccess, key)
 	if v, ok := tracker[key]; ok {
 		v()
@@ -52,7 +56,7 @@ func (config *proxy) Set(key string, value interface{}) error {
 	return nil
 }
 func (config *proxy) SetMulti(data map[string]interface{}) error {
-	instances[len(instances)-1].SetMulti(data)
+	drivers[len(drivers)-1].SetMulti(data)
 	for key, _ := range data {
 		if v, ok := tracker[key]; ok {
 			v()
@@ -60,10 +64,10 @@ func (config *proxy) SetMulti(data map[string]interface{}) error {
 	}
 	return nil
 }
-func (config *proxy) Register(settings ...interface{}) {
+func (config *proxy) Register(settings ...interface{}) error {
 	if len(settings) > 0 {
 		if _, ok := settings[0].(Setting); ok {
-			instances[len(instances)-1].Register(settings...)
+			return drivers[len(drivers)-1].Register(settings...)
 		} else {
 			var pkg = ""
 			var set []interface{}
@@ -127,10 +131,10 @@ func (config *proxy) Register(settings ...interface{}) {
 					}
 				}
 			}
-			instances[len(instances)-1].Register(set...)
+			drivers[len(drivers)-1].Register(set...)
 		}
 	}
-
+	return nil
 }
 
 func guessType(t reflect.Type) string {
@@ -151,5 +155,5 @@ func guessType(t reflect.Type) string {
 }
 func (config *proxy) Init(params ...string) error {
 
-	return instances[len(instances)-1].Init(params...)
+	return drivers[len(drivers)-1].Init(params...)
 }

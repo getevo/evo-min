@@ -6,10 +6,12 @@ type Message struct {
 	Time    time.Time
 	Message []byte
 }
+
 type Interface interface {
+	Name() string
 	Register() error
-	Subscribe(topic string, sink func(message Message), params ...interface{})
-	Publish(topic string, message interface{})
+	Subscribe(topic string, onMessage func(topic string, message []byte, driver Interface), params ...interface{})
+	Publish(topic string, message []byte, params ...interface{}) error
 
 	// SetMarshaller set interface{} to []byte marshalling function
 	SetMarshaller(func(input interface{}) ([]byte, error))
