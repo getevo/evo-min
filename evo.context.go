@@ -84,7 +84,7 @@ func Upgrade(ctx *fiber.Ctx) *Request {
 }
 
 func (r *Request) WriteResponse(resp ...interface{}) {
-	defer r._writeResponse(r.Response)
+
 	if len(resp) == 0 {
 		return
 	}
@@ -99,16 +99,24 @@ func (r *Request) WriteResponse(resp ...interface{}) {
 				for _, err := range item.([]error) {
 					r.Response.Error = append(r.Response.Error, err.Error())
 				}
+				r._writeResponse(r.Response)
 				return
 			} else {
+				if v, ok := item.([]byte); ok {
+					r.Write(v)
+					return
+				}
+
 				r.Response.Success = true
 				r.Response.Data = item
+				r._writeResponse(r.Response)
 				return
 			}
 		case reflect.Struct, reflect.Ptr:
 			if ref.Type() == errorType {
 				r.Response.Success = true
 				r.Response.Error = append(r.Response.Error, item.(error).Error())
+				r._writeResponse(r.Response)
 				return
 			}
 			for ref.Kind() == reflect.Ptr {
@@ -118,6 +126,7 @@ func (r *Request) WriteResponse(resp ...interface{}) {
 
 			if v, ok := instance.(Response); ok {
 				r.Response = v
+				r._writeResponse(r.Response)
 				return
 			}
 
@@ -134,6 +143,7 @@ func (r *Request) WriteResponse(resp ...interface{}) {
 
 				if v.RedirectURL != "" {
 					r.Location(v.RedirectURL)
+					r._writeResponse(r.Response)
 					return
 				}
 
@@ -160,6 +170,8 @@ func (r *Request) WriteResponse(resp ...interface{}) {
 						r.Response.Error = append(r.Response.Error, err)
 					}
 				}
+			} else {
+				r.Response.Data = item
 			}
 
 		case reflect.Bool:
@@ -182,6 +194,10 @@ func (r *Request) WriteResponse(resp ...interface{}) {
 		}
 
 	}
+	if r.Response.Data == nil {
+		r.Response.Success = false
+	}
+	r._writeResponse(r.Response)
 
 }
 
