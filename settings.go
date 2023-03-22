@@ -180,4 +180,8 @@ type HTTPConfig struct {
 	//
 	// Default: NetworkTCP4
 	Network string `description:"Known networks are tcp, tcp4 (IPv4-only), tcp6 (IPv6-only)" default:"tcp4" yaml:"network" json:"network"`
+
+	// If set to true, will print all routes with their method, path and handler.
+	// Default: false
+	EnablePrintRoutes bool `description:"If set to true, will print all routes with their method, path and handler." default:"false" yaml:"enable_print_routes" json:"enable_print_routes"`
 }

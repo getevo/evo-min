@@ -14,6 +14,7 @@ var (
 	Any func(request *Request) error
 )
 var http = HTTPConfig{}
+var fiberConfig = fiber.Config{}
 
 // Setup set up the EVO app
 func Setup() {
@@ -22,13 +23,15 @@ func Setup() {
 		log.Fatal(err)
 	}
 	settings.Register("HTTP", &http)
-	var fiberConfig = fiber.Config{}
-	generic.Parse(http).Cast(&fiberConfig)
+
+	err = generic.Parse(http).Cast(&fiberConfig)
+
 	app = fiber.New(fiberConfig)
 	if settings.Get("Database.Enabled").Bool() {
 		database.SetDBO(GetDBO())
 		settings.SetDefaultDriver(database.Driver)
 	}
+
 	cache.Register()
 }
 

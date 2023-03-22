@@ -1,68 +1,72 @@
 package evo
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/getevo/evo-min/lib/log"
+	"github.com/getevo/evo-min/lib/outcome"
 	"github.com/gofiber/fiber/v2"
 	"net/url"
 	"reflect"
 	"strings"
 	"time"
-
-	e "github.com/getevo/evo-min/errors"
 )
 
+var errorType = reflect.TypeOf(fmt.Errorf(""))
+var errorsType = reflect.TypeOf([]error{})
+
+type CacheControl struct {
+	Duration      time.Duration
+	Key           string
+	ExposeHeaders bool
+}
+
 type Request struct {
-	Variables     fiber.Map
-	Context       *fiber.Ctx
-	Additional    interface{}
-	Response      Response
-	CacheKey      string
-	CacheDuration time.Duration
-	Debug         bool
-	flashes       []flash
-	BeforeWrite   func(request *Request, body []byte) []byte
+	Context      *fiber.Ctx
+	Response     Response
+	CacheControl *CacheControl
+	url          *URL
+	status       int
+	_break       bool
 }
-type flash struct {
-	Type    string `json:"type"`
-	Message string `json:"message"`
-}
+
 type Response struct {
 	Success bool        `json:"success"`
-	Message string      `json:"message"`
-	Error   e.Errors    `json:"errors"`
-	Data    interface{} `json:"data"`
-	Code    int         `json:"code"`
+	Error   []string    `json:"errors,omitempty"`
+	Data    interface{} `json:"data,omitempty"`
 }
 
 type URL struct {
-	Query  url.Values
-	Host   string
-	Scheme string
-	Path   string
-	Raw    string
+	Query       url.Values
+	QueryString string
+	Host        string
+	Scheme      string
+	Path        string
+	Raw         string
 }
 
 func (response Response) HasError() bool {
-	return response.Error.Exist()
+	return len(response.Error) > 0
 }
 
 func (r *Request) URL() *URL {
-	u := URL{}
-	base := strings.Split(r.BaseURL(), "://")
-	u.Scheme = base[0]
-	u.Host = r.Hostname()
-	u.Raw = r.OriginalURL()
-	parts := strings.Split(u.Raw, "?")
-	if len(parts) == 1 {
-		u.Query = url.Values{}
-		u.Path = u.Raw
-	} else {
-		u.Path = parts[0]
-		u.Query, _ = url.ParseQuery(strings.Join(parts[1:], "?"))
+	if r.url != nil {
+		return r.url
 	}
-	return &u
+	r.url = &URL{}
+	base := strings.Split(r.BaseURL(), "://")
+	r.url.Scheme = base[0]
+	r.url.Host = r.Hostname()
+	r.url.Raw = r.OriginalURL()
+	parts := strings.Split(r.url.Raw, "?")
+	if len(parts) == 1 {
+		r.url.Query = url.Values{}
+		r.url.Path = r.url.Raw
+		r.url.QueryString = ""
+	} else {
+		r.url.Path = parts[0]
+		r.url.Query, _ = url.ParseQuery(strings.Join(parts[1:], "?"))
+		r.url.QueryString = parts[1]
+	}
+	return r.url
 }
 func (u *URL) Set(key string, value interface{}) *URL {
 	u.Query.Set(key, fmt.Sprint(value))
@@ -73,58 +77,15 @@ func (u *URL) String() string {
 }
 
 func Upgrade(ctx *fiber.Ctx) *Request {
-	if request := ctx.Locals("evo.request"); request != nil {
-		return request.(*Request)
-	}
 	r := Request{}
-	r.Variables = fiber.Map{}
 	r.Context = ctx
-	r.Response = Response{}
-	r.Response.Error = e.Errors{}
-	ctx.Locals("evo.request", &r)
+	r.Response = Response{Success: true}
 	return &r
 }
 
-func (r *Request) Flash(params ...string) {
-	if len(params) == 0 {
-		return
-	}
-	if len(r.flashes) == 0 {
-		cookie := r.Cookies("flash")
-		if cookie != "" {
-			json.Unmarshal([]byte(cookie), &r.flashes)
-		}
-	}
-	if len(params) == 1 {
-		r.flashes = append(r.flashes, flash{"info", params[0]})
-
-	} else {
-		r.flashes = append(r.flashes, flash{params[0], params[1]})
-	}
-	r.SetCookie("flash", r.flashes)
-}
-
-func (r *Request) Cached(duration time.Duration, key ...string) bool {
-	r.CacheKey = ""
-	r.CacheDuration = duration
-	for _, item := range key {
-		r.CacheKey += item
-	}
-	if v, ok := Cache.Get(r.CacheKey); ok {
-		if resp, ok := v.(cached); ok {
-			r.Context.Context().Response.Header = resp.header
-			r.Context.Context().SetStatusCode(resp.code)
-			r.Context.Context().Response.SetBody(resp.content)
-
-			return true
-		}
-	}
-	return false
-}
-
 func (r *Request) WriteResponse(resp ...interface{}) {
+	defer r._writeResponse(r.Response)
 	if len(resp) == 0 {
-		r._writeResponse(r.Response)
 		return
 	}
 	var message = false
@@ -132,46 +93,84 @@ func (r *Request) WriteResponse(resp ...interface{}) {
 		ref := reflect.ValueOf(item)
 
 		switch ref.Kind() {
-		case reflect.Struct:
-			if v, ok := item.(Response); ok {
-				r._writeResponse(v)
+		case reflect.Slice:
+			if ref.Type() == errorsType {
+				r.Response.Success = false
+				for _, err := range item.([]error) {
+					r.Response.Error = append(r.Response.Error, err.Error())
+				}
 				return
-			} else if v, ok := item.(e.Error); ok {
-				r.Response.Error.Push(&v)
-				r._writeResponse(r.Response)
 			} else {
 				r.Response.Success = true
 				r.Response.Data = item
-			}
-
-		case reflect.Ptr:
-			obj := ref.Elem().Interface()
-			if v, ok := obj.(Response); ok {
-				r._writeResponse(v)
 				return
-			} else if v, ok := obj.(e.Error); ok {
-				r.Response.Error.Push(&v)
-			} else if v, ok := item.(error); ok {
+			}
+		case reflect.Struct, reflect.Ptr:
+			if ref.Type() == errorType {
+				r.Response.Success = true
+				r.Response.Error = append(r.Response.Error, item.(error).Error())
+				return
+			}
+			for ref.Kind() == reflect.Ptr {
+				ref = ref.Elem()
+			}
+			instance := ref.Interface()
 
-				r.Response.Error.Push(e.Context(v.Error()))
-			} else {
-				r.Response.Data = obj
+			if v, ok := instance.(Response); ok {
+				r.Response = v
+				return
 			}
 
-			break
+			if v, ok := instance.(outcome.Response); ok {
+
+				if v.StatusCode > 0 {
+					r.Status(v.StatusCode)
+				}
+				if len(v.Cookies) > 0 {
+					for idx, _ := range v.Cookies {
+						r.SetRawCookie(v.Cookies[idx])
+					}
+				}
+
+				if v.RedirectURL != "" {
+					r.Location(v.RedirectURL)
+					return
+				}
+
+				if v.Data != nil {
+					r.Response.Success = true
+					r.Response.Data = v.Data
+				}
+
+				if v.ContentType != "" {
+					r.SetHeader("Content-Type", v.ContentType)
+				} else {
+					r.SetHeader("Content-Type", fiber.MIMEApplicationJSONCharsetUTF8)
+				}
+
+				if len(v.Headers) > 0 {
+					for header, value := range v.Headers {
+						r.SetHeader(header, value)
+					}
+				}
+
+				if len(v.Errors) > 0 {
+					r.Response.Success = false
+					for _, err := range v.Errors {
+						r.Response.Error = append(r.Response.Error, err)
+					}
+				}
+			}
+
 		case reflect.Bool:
 			r.Response.Success = item.(bool)
 			break
 		case reflect.Int32, reflect.Int16, reflect.Int64:
-			if r.Response.Code == 0 || len(r.Response.Error) > 0 {
-				r.Response.Code = item.(int)
-			} else {
-				r.Response.Data = item.(int)
-			}
+			r.Response.Data = item.(int)
 			break
 		case reflect.String:
 			if !message {
-				r.Response.Message = item.(string)
+				r.Response.Data = item.(string)
 				message = true
 			} else {
 				r.Response.Data = item
@@ -183,55 +182,64 @@ func (r *Request) WriteResponse(resp ...interface{}) {
 		}
 
 	}
-	r._writeResponse(r.Response)
 
 }
 
 func (r *Request) _writeResponse(resp Response) {
-	if resp.HasError() {
-		r.Response.Success = false
-	} else {
-		r.Response.Success = true
+	switch v := resp.Data.(type) {
+	case []byte:
+		r.Write(v)
+	default:
+		r.JSON(r.Response)
 	}
-	r.JSON(r.Response)
+
 }
 
-func (r *Request) SetError(err interface{}) {
+func (r *Request) Error(err interface{}, code ...int) bool {
+	if err == nil {
+		return false
+	}
+	r._break = true
+	if len(code) > 0 {
+		r.status = code[0]
+	} else if r.status < 400 {
+		r.status = fiber.StatusBadRequest
+	}
 	if v, ok := err.(error); ok {
-		r.Response.Error.Push(e.Context(v.Error()))
-		return
+		r.Response.Error = append(r.Response.Error, v.Error())
+	} else {
+		r.Response.Error = append(r.Response.Error, fmt.Sprint(err))
 	}
-	if v, ok := err.(e.Error); ok {
-		r.Response.Error.Push(&v)
-		return
-	}
-	if v, ok := err.(*e.Error); ok {
-		r.Response.Error.Push(v)
-		return
-	}
-	log.Error("invalid error provided %+v", err)
-
+	r._writeResponse(r.Response)
+	return true
 }
 
-func (r *Request) Throw(e *e.Error) {
-	r.Response.Error.Push(e)
-	r.WriteResponse()
+func (r *Request) PushError(err interface{}, code ...int) bool {
+	if err == nil {
+		return false
+	}
+	if len(code) > 0 {
+		r.status = code[0]
+	} else if r.status < 400 {
+		r.status = fiber.StatusBadRequest
+	}
+	if v, ok := err.(error); ok {
+		r.Response.Error = append(r.Response.Error, v.Error())
+		return true
+	}
+	r.Response.Error = append(r.Response.Error, fmt.Sprint(err))
+
+	return true
 }
 
 func (r *Request) HasError() bool {
-	return r.Response.Error.Exist()
+	return len(r.Response.Error) > 0
 }
 
-func (r *Request) Var(key string, value interface{}) {
-	r.Variables[key] = value
+func (r *Request) Var(key string, value ...interface{}) interface{} {
+	return r.Context.Locals(key, value...)
 }
 
-func (r Request) GetFlashes() []flash {
-	var resp []flash
-	flash := r.Cookies("flash")
-	if flash != "" {
-		json.Unmarshal([]byte(flash), &resp)
-	}
-
-	return resp
+func (r *Request) RestartRouting() error {
+	return r.Context.RestartRouting()
 }

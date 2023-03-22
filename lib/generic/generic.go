@@ -317,7 +317,7 @@ func (v Value) SizeInBytes() uint64 {
 		switch match[0][2] {
 		case "kb":
 			base *= 1024
-		case "", "mb":
+		case "mb":
 			base *= 1024 * 1024 * 1024
 		case "gb":
 			base *= 1024 * 1024 * 1024 * 1024
@@ -326,6 +326,7 @@ func (v Value) SizeInBytes() uint64 {
 		case "eb":
 			base *= 1024 * 1024 * 1024 * 1024 * 1024 * 1024
 		}
+
 		return base
 	}
 	return 0
@@ -637,4 +638,8 @@ func indirectType(input interface{}) reflect.Type {
 		ref = ref.Elem()
 	}
 	return ref
+}
+
+func (v Value) IsEmpty() bool {
+	return v.Input == nil || reflect.ValueOf(v.Input).IsNil()
 }

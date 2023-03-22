@@ -73,6 +73,9 @@ func SetStackTrace(lvl int) {
 }
 
 func msg(message interface{}, level Level, params ...interface{}) {
+	if message == nil {
+		return
+	}
 	_, file, line, _ := runtime.Caller(2)
 	var result = "{"
 	result += "\"l\":" + quote(levels[level])
