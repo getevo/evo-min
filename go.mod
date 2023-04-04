@@ -14,7 +14,6 @@ require (
 	github.com/iancoleman/strcase v0.2.0
 	github.com/kelindar/binary v1.0.17
 	github.com/otiai10/copy v1.9.0
-	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/segmentio/kafka-go v0.4.39
 	github.com/tidwall/gjson v1.7.4
 	github.com/valyala/fasthttp v1.44.0
@@ -36,7 +35,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/klauspost/compress v1.16.0 // indirect
+	github.com/klauspost/compress v1.16.3 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
