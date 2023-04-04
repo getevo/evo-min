@@ -8,7 +8,6 @@ require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/awoodbeck/strftime v0.0.0-20180221155908-016cde65fcde
 	github.com/fatih/structs v1.1.0
-	github.com/getevo/evo v1.1.4
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/gofiber/fiber/v2 v2.42.0
 	github.com/gofiber/utils/v2 v2.0.0-beta.1
